@@ -4,7 +4,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Link Summon procedure: 1 Level 4 or lower "Prank-Kids" monster
-	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTunerEx(Card.IsSetCard,SET_PRANK_KIDS),1,99,s.exmatfilter)
+	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTunerEx(nil),1,99,s.exmatfilter)
 	--Add from Deck to hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
