@@ -5,14 +5,14 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Link Summon procedure: 1 Level 4 or lower "Prank-Kids" monster
 	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTunerEx(Card.IsSetCard,SET_PRANK_KIDS),1,99,s.exmatfilter)
-	--A "Prank-Kids" pointed by this card gains 1000 ATK/DEF
+	--atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetTarget(s.atktg)
-	e1:SetValue(1000)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,SET_PRANK_KIDS))
+	e1:SetValue(300)
 	c:RegisterEffect(e1)
 	--Add 2 "Prank-Kids" cards from GY
 	local e2=Effect.CreateEffect(c)
@@ -34,9 +34,6 @@ s.listed_series={SET_PRANK_KIDS}
 s.listed_names={id}
 function s.exmatfilter(c,scard,sumtype,tp)
 	return c:IsSetCard(SET_PRANK_KIDS,lc,sumtype,tp)
-end
-function s.atktg(e,c)
-	return e:GetHandler():GetLinkedGroup():IsContains(c) and c:IsSetCard(SET_PRANK_KIDS)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsTurnPlayer(tp)
