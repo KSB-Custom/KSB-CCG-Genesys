@@ -4,7 +4,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Link Summon procedure: 1 Level 4 or lower "Prank-Kids" monster
-	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTunerEx(nil),1,1,s.exmatfilter)
+	Synchro.AddProcedure(c,nil,1,1,Synchro.NonTuner(nil),1,1,s.exmatfilter)
 	--You can only Link Summon "Prank-Kids Meow-Meow-Mu" once per turn
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)

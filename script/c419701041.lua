@@ -1,4 +1,4 @@
---Prank-Kids Mysterious
+--Prank-Kids Mixed Merger
 --GENESYS FORMAT
 local s,id=GetID()
 function s.initial_effect(c)

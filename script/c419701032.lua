@@ -19,7 +19,7 @@ s.listed_names={id}
 function s.reccon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=c:GetReasonCard()
-	return c:IsLocation(LOCATION_GRAVE) and rc:IsSetCard(SET_PRANK_KIDS) and r & REASON_FUSION+REASON_LINK ~=0
+	return c:IsLocation(LOCATION_GRAVE) and rc:IsSetCard(SET_PRANK_KIDS) and r & REASON_FUSION+REASON_SYNCHRO ~=0
 end
 function s.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
