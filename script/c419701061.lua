@@ -36,7 +36,7 @@ function s.exmatfilter(c,scard,sumtype,tp)
 	return c:IsSetCard(SET_PRANK_KIDS,lc,sumtype,tp)
 end
 function s.thcon(e)
-	return e:GetHandler():IsLinkSummoned()
+	return e:GetHandler():IsSynchroSummoned()
 end
 function s.thfilter1(c)
 	return c:IsSetCard(SET_PRANK_KIDS) and c:IsSpellTrap() and c:IsAbleToHand()
