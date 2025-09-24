@@ -40,28 +40,27 @@ function s.lkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE|PHASE_END,0,1)
 end
-function s.lkfilter(c,mg)
-	return c:IsSetCard(SET_PRANK_KIDS) and c:IsLinkSummonable(nil,mg)
+function s.syncheck(tp,sg,sc)
+	return sg:IsExists(Card.IsSetCard,1,nil,SET_PRANK_KIDS)
 end
 function s.lktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local el={}
-		local mg=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsSetCard,SET_PRANK_KIDS),tp,LOCATION_MZONE,0,nil)
-		return Duel.IsExistingMatchingCard(s.lkfilter,tp,LOCATION_EXTRA,0,1,nil,mg)
+		Synchro.CheckAdditional=s.syncheck
+		local res=Duel.IsExistingMatchingCard(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,1,nil)
+		Synchro.CheckAdditional=nil
+		return res
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.lkop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	local el={}
-	local mg=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsSetCard,SET_PRANK_KIDS),tp,LOCATION_MZONE,0,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local xg=Duel.SelectMatchingCard(tp,s.lkfilter,tp,LOCATION_EXTRA,0,1,1,nil,mg)
-	local tc=xg:GetFirst()
-	if tc then
-		Duel.LinkSummon(tp,tc,nil,mg)
+	Synchro.CheckAdditional=s.syncheck
+	local g=Duel.GetMatchingGroup(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,nil)
+	if #g>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.SynchroSummon(tp,sg:GetFirst())
 	end
+	Synchro.CheckAdditional=nil
 end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp)
