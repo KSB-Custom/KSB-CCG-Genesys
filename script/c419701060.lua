@@ -26,6 +26,16 @@ function s.initial_effect(c)
 	e1:SetValue(s.repval)
 	e1:SetOperation(s.repop)
 	c:RegisterEffect(e1)
+	--Increase or Decrease its Level by 1
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_LVCHANGE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetTarget(s.lvtg)
+	e2:SetOperation(s.lvop)
+	c:RegisterEffect(e2)
 end
 s.listed_series={SET_PRANK_KIDS}
 s.listed_names={id}
@@ -51,4 +61,27 @@ end
 function s.repop(base,e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
 	Duel.Remove(base:GetHandler(),POS_FACEUP,REASON_COST|REASON_REPLACE)
+end
+--
+function s.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:HasLevel() end
+	Duel.SetOperationInfo(0,CATEGORY_LVCHANGE,c,1,tp,1)
+end
+function s.lvop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not (c:IsFaceup() and c:IsRelateToEffect(e) and c:HasLevel()) then return end
+	local b1=true
+	local b2=c:IsLevelAbove(2)
+	local op=Duel.SelectEffect(tp,
+		{b1,aux.Stringid(id,2)}, --Increase its Level by 1
+		{b2,aux.Stringid(id,3)}) --Decrease its Level by 1
+	local value=(op==1 and op) or -1
+	---Increase or decrease its Level by 1
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_LEVEL)
+	e1:SetValue(value)
+	e1:SetReset(RESET_EVENT|RESETS_STANDARD_DISABLE)
+	c:RegisterEffect(e1)
 end
