@@ -15,7 +15,8 @@ function s.initial_effect(c)
 	e1:SetTarget(s.hsptg)
 	e1:SetOperation(s.hspop)
 	c:RegisterEffect(e1)
-	--Fusion Summon 1 "Vaylantz" Fusion Monster
+	Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,s.chainfilter)
+	--Fusion Summon 1 "Prank-Kids" Fusion Monster
 	local fusparams={aux.FilterBoolFunction(Card.IsSetCard,SET_PRANK_KIDS),nil,s.fextra}
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
@@ -28,6 +29,9 @@ function s.initial_effect(c)
 	e3:SetOperation(Fusion.SummonEffOP(table.unpack(fusparams)))
 	c:RegisterEffect(e3)
 end
+function s.chainfilter(re,tp,cid)
+	return not (re:IsMonsterEffect() and re:GetActivateLocation()&(LOCATION_HAND|LOCATION_GRAVE)>0)
+end
 function s.fextra(e,tp,mg)
 	return Duel.GetMatchingGroup(Fusion.IsMonsterFilter(Card.IsAbleToGrave),tp,LOCATION_DECK,0,nil)
 end
@@ -36,7 +40,7 @@ function s.extratg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,0,tp,LOCATION_HAND|LOCATION_DECK|LOCATION_MZONE)
 end
 function s.hspfilter(c,tp,sc)
-	return c:IsSetCard(SET_PRANK_KIDS) and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0
+	return c:IsSetCard(SET_PRANK_KIDS) and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0 and Duel.GetCustomActivityCount(id,1-tp,ACTIVITY_CHAIN)>0
 end
 function s.hspcon(e,c)
 	if c==nil then return true end
