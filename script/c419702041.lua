@@ -60,7 +60,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	ft=math.min(ft,Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and 1 or 2)
 	local sg=aux.SelectUnselectGroup(g1,e,tp,1,ft,aux.dncheck,1,tp,HINTMSG_SPSUMMON)
 	for tc in sg:Iter() do
-		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_DEFENSE) then
+		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
 			--Negate their effects
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
