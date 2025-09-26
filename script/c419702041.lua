@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	--Add 2 "Majespecter" Monsters to the hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_TOEXTRA)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -20,15 +20,15 @@ function s.initial_effect(c)
 end
 s.listed_series={SET_MAJESPECTER,SET_DRACOSLAYER}
 function s.thfilter(c)
-	return c:IsSetCard(SET_MAJESPECTER) and c:IsAbleToHand()
+	return c:IsSetCard(SET_MAJESPECTER) and c:IsMonster() and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_EXTRA,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
-	Duel.SetPossibleOperationInfo(0,CATEGORY_TOEXTRA,nil,1,tp,LOCATION_DECK)
+	Duel.SetPossibleOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_GRAVE)
 end
 function s.tefilter(c)
-	return c:IsSetCard(SET_MAJESPECTER) and c:IsType(TYPE_PENDULUM) and not c:IsForbidden()
+	return c:IsSetCard(SET_MAJESPECTER) and not c:IsForbidden()
 end
 function s.spfilter1(c,e,tp)
 	return c:IsSetCard(SET_MAJESPECTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -49,15 +49,32 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	aux.addTempLizardCheck(c,tp,function(_,c) return not c:IsOriginalSetCard({SET_MAJESPECTER,SET_DRACOSLAYER}) end)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,2,nil)
-	if #g==0 or Duel.SendtoHand(g,tp,REASON_EFFECT)==0 or #g:Match(Card.IsLocation,nil,LOCATION_HAND)==0 then return end
+	if #g>0 then 
+	Duel.SendtoHand(g,tp,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,g)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then 
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if ft==0 then return end
 		local g1=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter1),tp,LOCATION_HAND|LOCATION_GRAVE,0,nil,e,tp)
-		if #g1>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-			Duel.BreakEffect()
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local g2=g1:Select(tp,1,2,nil)
-			Duel.SpecialSummon(g2,0,tp,tp,false,false,POS_FACEUP)
+		if #g1==0 then return end
+	ft=math.min(ft,Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and 1 or 2)
+	local sg=aux.SelectUnselectGroup(g1,e,tp,1,ft,aux.dncheck,1,tp,HINTMSG_SPSUMMON)
+	for tc in sg:Iter() do
+		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_DEFENSE) then
+			--Negate their effects
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_DISABLE)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+			tc:RegisterEffect(e1,true)
+			local e2=Effect.CreateEffect(e:GetHandler())
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(EFFECT_DISABLE_EFFECT)
+			e2:SetReset(RESET_EVENT|RESETS_STANDARD)
+			tc:RegisterEffect(e2,true)
 		end
+		Duel.SpecialSummonComplete()
+	end
+	end
 	end
 end
